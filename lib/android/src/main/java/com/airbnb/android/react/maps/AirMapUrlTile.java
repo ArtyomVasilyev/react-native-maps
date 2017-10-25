@@ -5,48 +5,17 @@ import android.content.Context;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.TileOverlay;
 import com.google.android.gms.maps.model.TileOverlayOptions;
-import com.google.android.gms.maps.model.UrlTileProvider;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 
 public class AirMapUrlTile extends AirMapFeature {
 
-  class AIRMapUrlTileProvider extends UrlTileProvider {
-    private String urlTemplate;
-
-    public AIRMapUrlTileProvider(int width, int height, String urlTemplate) {
-      super(width, height);
-      this.urlTemplate = urlTemplate;
-    }
-
-    @Override
-    public synchronized URL getTileUrl(int x, int y, int zoom) {
-
-      String s = this.urlTemplate
-          .replace("{x}", Integer.toString(x))
-          .replace("{y}", Integer.toString(y))
-          .replace("{z}", Integer.toString(zoom));
-      URL url = null;
-      try {
-        url = new URL(s);
-      } catch (MalformedURLException e) {
-        throw new AssertionError(e);
-      }
-      return url;
-    }
-
-    public void setUrlTemplate(String urlTemplate) {
-      this.urlTemplate = urlTemplate;
-    }
-  }
-
   private TileOverlayOptions tileOverlayOptions;
   private TileOverlay tileOverlay;
-  private AIRMapUrlTileProvider tileProvider;
+  private TranslucentUrlTileProvider tileProvider;
 
   private String urlTemplate;
   private float zIndex;
+  private float opacity;
 
   public AirMapUrlTile(Context context) {
     super(context);
@@ -69,6 +38,13 @@ public class AirMapUrlTile extends AirMapFeature {
     }
   }
 
+  public void setOpacity(float opacity) {
+    this.opacity = opacity;
+    if (tileProvider != null) {
+      tileProvider.setOpacity(opacity);
+    }
+  }
+
   public TileOverlayOptions getTileOverlayOptions() {
     if (tileOverlayOptions == null) {
       tileOverlayOptions = createTileOverlayOptions();
@@ -79,7 +55,7 @@ public class AirMapUrlTile extends AirMapFeature {
   private TileOverlayOptions createTileOverlayOptions() {
     TileOverlayOptions options = new TileOverlayOptions();
     options.zIndex(zIndex);
-    this.tileProvider = new AIRMapUrlTileProvider(256, 256, this.urlTemplate);
+    this.tileProvider = new TranslucentUrlTileProvider(256, 256, this.urlTemplate, this.opacity);
     options.tileProvider(this.tileProvider);
     return options;
   }

@@ -17,6 +17,13 @@
 {
   _urlTemplate = urlTemplate;
   _tileLayer = [GMSURLTileLayer tileLayerWithURLConstructor:[self _getTileURLConstructor]];
+  [self setOpacity:_opacity];
+}
+
+- (void)setOpacity:(double)opacity
+{
+  _opacity = opacity;
+  _tileLayer.opacity = opacity;
 }
 
 - (GMSTileURLConstructor)_getTileURLConstructor
